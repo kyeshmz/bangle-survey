@@ -39,7 +39,7 @@ function drawDisplay() {
 }
 
 // Handle heart rate data
-Bangle.on("HRM", function (hrm) {
+Bangle.on("HRM-raw", function (hrm) {
 	// console.log(hrm);
 	if (hrm.confidence > 50) {
 		lastHeartRate = hrm.bpm;

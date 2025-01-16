@@ -1,0 +1,59 @@
+https://www.espruino.com/Bangle.js+Development#using-the-right-hand-side-of-the-ide
+
+For development of the platform, there are 2 options
+
+1. Emulator - https://www.espruino.com/ide/?emulator
+2. Development on the device - https://www.espruino.com/ide/
+
+When you want to install the
+
+RAM for dev, Storage for Prod
+Flash breaks all the bootloader stuff
+
+memos
+
+vector font bootloader
+//decimal values dont work for size
+g.setFont("Vector:12",1.5)
+
+g.getFonts()
+
+```
+>[
+  "4x6",
+  "6x8",
+  "12x20",
+  "6x15",
+  "Vector"
+ ]
+```
+
+this doesnt work g.setFont("12x20:0.5")
+
+https://www.espruino.com/Fonts
+
+g.setFont("8x16"); seems to be the best one for questions because its big enough
+
+## Acceleration data
+
+x is X axis (left-right) in g
+y is Y axis (up-down) in g
+z is Z axis (in-out) in g
+diff is difference between this and the last reading in g
+mag is the magnitude of the acceleration in g
+
+```
+{ "x": 0.13757324218, "y": 0.34716796875, "z": -0.95874023437, "mag": 1.02889981655,
+  "diff": 0.009765625 }
+{ "x": 0.13610839843, "y": 0.34326171875, "z": -0.95678710937, "mag": 1.02557090264,
+  "diff": 0.00451660156 }
+{ "x": 0.13439941406, "y": 0.34460449218, "z": -0.958984375, "mag": 1.02784555747,
+  "diff": 0.00305175781 }
+
+```
+
+Temperature
+
+```
+{ "temperature": 32.46463317871, "pressure": 1010.76270947779, "altitude": 20.72900490513 }
+```

@@ -1,10 +1,18 @@
 const storage = require("Storage").open("mood_log.json", "a");
-
+require("Font8x16").add(Graphics);
 // Constants for screen layout
 const sliderMin = 1;
 const sliderMax = 7;
 let sliderValue = 4; // Default slider value
 let currentQuestion = 0;
+
+// when the drawing of the slider starts
+// for both x and y
+const sliderX1 = 10;
+const sliderX2 = g.getWidth() - 10;
+const sliderY = 90;
+// for how much on top or bottom of the slider we can touch on
+const sliderTolerance = 30;
 
 // Questions array
 const questions = [
@@ -28,34 +36,25 @@ const sliderLabels = [
 	"Extremely", // 7
 ];
 
-function initializeSensors() {
-	Bangle.setOptions({
-		hrmPollInterval: 3,
-		powerSave: false,
-	});
-	Bangle.setBarometerPower(true);
-	Bangle.setHRMPower(1);
-	Bangle.setGPSPower(1);
-}
+// DRAW FUNCTIONS
 
 function drawTitle() {
 	g.setColor(0, 0, 0);
-	g.setFont("6x8", 1).setFontAlign(0, 0);
-	g.drawString(questions[currentQuestion], g.getWidth() / 2, 30);
+	//decimal values dont work for size
+
+	g.setFont("8x16").setFontAlign(0, 0);
+	g.drawString("How stressed are you?", g.getWidth() / 2, 30);
 }
 
 function drawButton() {
 	g.setColor(0, 0, 1); // Blue
-	g.fillRect(60, g.getHeight() - 50, g.getWidth() - 60, g.getHeight() - 10);
+	g.fillRect(60, g.getHeight() - 35, g.getWidth() - 60, g.getHeight() - 5);
 	g.setColor(1, 1, 1);
-	g.drawString("OK", g.getWidth() / 2, g.getHeight() - 30);
+	g.drawString("OK", g.getWidth() / 2, g.getHeight() - 27);
 }
 
 function drawSlider() {
 	// Slider bar
-	const sliderY = 90;
-	const sliderX1 = 30;
-	const sliderX2 = g.getWidth() - 30;
 	const sliderPosition =
 		sliderX1 +
 		((sliderX2 - sliderX1) / (sliderMax - sliderMin)) *
@@ -65,7 +64,7 @@ function drawSlider() {
 	g.fillRect(sliderX1, sliderY - 2, sliderX2, sliderY + 2);
 
 	g.setColor(1, 0, 0); // Red
-	g.fillCircle(sliderPosition, sliderY, 10);
+	g.fillCircle(sliderPosition, sliderY, 8);
 
 	// Display labels for slider values
 	const stepWidth = (sliderX2 - sliderX1) / (sliderMax - sliderMin);
@@ -75,16 +74,20 @@ function drawSlider() {
 		g.drawString(i, labelX, sliderY + 15); // Value numbers
 	}
 	// Display current value and message
-	g.setColor(1, 1, 1);
-	g.drawString("Value: " + sliderValue, g.getWidth() / 2, sliderY + 30);
-	g.drawString(sliderLabels[sliderValue - 1], g.getWidth() / 2, sliderY + 60);
+	g.setColor(0, 0, 0);
+	g.drawString(sliderLabels[sliderValue - 1], g.getWidth() / 2, sliderY - 35);
 }
 
 function drawFeedback(text) {
 	g.clear();
-	g.setFont("6x8", 2);
-	g.setFontAlign(0, 0);
+	g.setFont("8x16").setFontAlign(0, 0);
+	g.setColor(0, 0, 0);
 	g.drawString(text, g.getWidth() / 2, g.getHeight() / 2);
+	// Draw progress info
+	const questionsLeft = questions.length - (currentQuestion + 1);
+	const progressText = `Question ${currentQuestion + 1} of ${questions.length}`;
+	g.setFont("8x16");
+	g.drawString(progressText, g.getWidth() / 2, g.getHeight() / 2 + 20);
 	g.flip();
 }
 
@@ -120,16 +123,38 @@ function drawScreen() {
 	g.flip();
 }
 
-function handleTouch(zone, e) {
-	const touchX = e.x || 0;
-	const touchY = e.y || 0;
-
-	// Slider touch detection
-	const sliderY = 90;
+// Modify the existing drawSlider function to be called from drag handler
+function updateSliderValue(touchX) {
 	const sliderX1 = 30;
 	const sliderX2 = g.getWidth() - 30;
 
-	if (touchY > sliderY - 40 && touchY < sliderY + 40) {
+	if (touchX >= sliderX1 && touchX <= sliderX2) {
+		sliderValue = Math.round(
+			sliderMin +
+				((touchX - sliderX1) / (sliderX2 - sliderX1)) * (sliderMax - sliderMin)
+		);
+		sliderValue = Math.min(sliderMax, Math.max(sliderMin, sliderValue));
+		drawScreen();
+	}
+}
+
+// Add these new event handlers
+Bangle.on("drag", function (e) {
+	// Check if touch is within slider area (with some padding)
+	if (Math.abs(e.y - sliderY) < sliderTolerance) {
+		updateSliderValue(e.x);
+	}
+});
+
+// Main execution
+Bangle.on("touch", function (zone, e) {
+	const touchX = e.x || 0;
+	const touchY = e.y || 0;
+
+	if (
+		touchY > sliderY - sliderTolerance &&
+		touchY < sliderY + sliderTolerance
+	) {
 		if (touchX >= sliderX1 && touchX <= sliderX2) {
 			sliderValue = Math.round(
 				sliderMin +
@@ -151,8 +176,21 @@ function handleTouch(zone, e) {
 		Bangle.buzz(100);
 		nextQuestion();
 	}
+});
+
+//SENSORS
+
+function initializeSensors() {
+	Bangle.setOptions({
+		//hrmPollInterval: 3,
+		powerSave: false,
+	});
+	Bangle.setBarometerPower(true);
+	Bangle.setHRMPower(1);
+	Bangle.setGPSPower(1);
 }
 
+// MAIN
 function init() {
 	g.clear();
 	Bangle.loadWidgets();
@@ -160,9 +198,6 @@ function init() {
 	drawFeedback("Starting Pre-Quiz\nData Collection...");
 	initializeSensors();
 }
-
-// Main execution
-Bangle.on("touch", handleTouch);
 
 init();
 drawScreen();
