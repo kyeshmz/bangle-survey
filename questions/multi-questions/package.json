@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild main.js --platform=node --format=cjs --bundle --outfile=dist/bundle.js --external:Font8x16 --external:Storage ",
+    "build": "esbuild main.js --watch  --platform=node --format=cjs --bundle --outfile=dist/bundle.js --external:Font8x16 --external:Storage ",
+    "minify": "esbuild main.js --minify --platform=node --format=cjs --bundle --outfile=dist/bundle.js --external:Font8x16 --external:Storage ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

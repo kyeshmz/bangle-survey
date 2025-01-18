@@ -1,11 +1,13 @@
-const {
-	sliderX1,
-	sliderX2,
+import {
+	HOUR_MS,
+	questions,
+	sliderLabels,
 	sliderMax,
 	sliderMin,
+	sliderX1,
+	sliderX2,
 	sliderY,
-	questions,
-} = require("./constants");
+} from "./constants";
 
 export function drawTitle() {
 	g.setColor(0, 0, 0);
@@ -49,14 +51,15 @@ export function drawSlider(sliderValue) {
 
 export function drawFeedback(text, currentQuestion) {
 	g.clear();
-	g.setFont("8x16").setFontAlign(0, 0);
-	g.setColor(0, 0, 0);
+	g.setFont("8x16").setFontAlign(0, 0).setColor(0, 0, 0);
 	g.drawString(text, g.getWidth() / 2, g.getHeight() / 2);
 	// Draw progress info
-	const questionsLeft = questions.length - (currentQuestion + 1);
-	const progressText = `Question ${currentQuestion + 1} of ${questions.length}`;
-	g.setFont("8x16");
-	g.drawString(progressText, g.getWidth() / 2, g.getHeight() / 2 + 20);
+	const questionsLeft = questions.length - currentQuestion - 1;
+	const progressText = `Remaining ${questionsLeft} of ${questions.length}`;
+	if (currentQuestion != 0) {
+		g.setFont("8x16");
+		g.drawString(progressText, g.getWidth() / 2, g.getHeight() / 2 + 20);
+	}
 	g.flip();
 }
 export function drawWaitingScreen() {
@@ -78,10 +81,10 @@ export function drawWaitingScreen() {
 	g.flip();
 }
 
-export function drawScreen() {
+export function drawScreen(sliderValue) {
 	g.clear();
 	drawTitle();
-	drawSlider();
+	drawSlider(sliderValue);
 	drawButton();
 	g.flip();
 }

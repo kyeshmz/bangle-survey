@@ -1,4 +1,4 @@
-const storage = require("Storage").open("mood_log.json", "a");
+export const storage = require("Storage");
 require("Font8x16").add(Graphics);
 // Constants for screen layout
 export const sliderMin = 1;
@@ -12,7 +12,10 @@ export const sliderY = 90;
 // for how much on top or bottom of the slider we can touch on
 export const sliderTolerance = 30;
 
-export const dataPollingInterval = 1000 * 5;
+export const lastQuizTimeName = "last_quiz_time.json";
+
+// every 5 seconds
+export const dataPollingInterval = 1000 * 2;
 
 // Questions array
 export const questions = [

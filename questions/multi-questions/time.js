@@ -1,25 +1,24 @@
-const { HOUR_MS } = require("./constants");
-// Function to check the current time and save it as the last quiz time
-export function updateLastQuizTime(storage) {
-	// we are almost guaranteed that last_quiz_time.json exists
+import { HOUR_MS, lastQuizTimeName, storage } from "./constants";
 
-	const data = storage.writeJSON("last_quiz_time.json", {
-		lastQuizTime: Date.now(),
+// Function to check the current time and save it as the last quiz time
+export function updateLastQuizTime(state) {
+	storage.writeJSON(lastQuizTimeName, {
+		lastQuizTime: state.endTime,
 	});
 }
-export function checkIfHourHasPassed(storage) {
+export function checkIfHourHasPassed() {
 	const currentTime = Date.now();
 	let lastQuizTime;
 	try {
-		const data = storage.readJSON("last_quiz_time.json");
+		const data = storage.readJSON(lastQuizTimeName);
 		lastQuizTime = data.lastQuizTime;
 	} catch (e) {
 		console.error("Adding new time, Error reading last quiz time: ", e.message);
 		const data = { lastQuizTime: Date.now() };
-		storage.write("last_quiz_time.json", JSON.stringify(data));
+		storage.writeJSON(lastQuizTimeName, data);
 		lastQuizTime = Date.now();
 	}
-	const timeElapsed = currentTime - data.lastQuizTime;
+	const timeElapsed = currentTime - lastQuizTime;
 	const hourPassed = Number(timeElapsed) > HOUR_MS;
 	const timeRemaining = HOUR_MS - (timeElapsed % HOUR_MS);
 
