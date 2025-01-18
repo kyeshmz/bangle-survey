@@ -1,0 +1,21 @@
+{
+  "name": "multi-questions",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild main.js --platform=node --format=cjs --bundle --outfile=dist/bundle.js --external:Font8x16 --external:Storage ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "esbuild": "^0.24.2",
+    "espruino": "^0.1.57"
+  },
+  "devDependencies": {
+    "@types/espruino": "^1.94.10",
+    "typescript": "^5.7.3"
+  }
+}
